@@ -1,94 +1,124 @@
-// Dados dos Imbuements
-const imbuementsData = [
-    // Aumento de Skill
-    {
-        imbuement: "Blockade (Skill Shield)",
-        imbuement_img: "images/iconsimbui/shield.gif",
-        basic_qty: "20", basic_item: "Piece of Scarab Shell", basic_img: "images/itensimbui/piece_of_scarab_shell.gif",
-        intricate_qty: "25", intricate_item: "Brimstone Shell", intricate_img: "images/itensimbui/brimstone_shell.gif",
-        powerful_qty: "25", powerful_item: "Frazzle Skin", powerful_img: "images/itensimbui/frazzle_skin.gif",
-        categoria: "Aumento de Skill"
-    },
-    {
-        imbuement: "Chop (Skill Axe)",
-        imbuement_img: "images/iconsimbui/axe.gif",
-        basic_qty: "20", basic_item: "Orc Tooth", basic_img: "images/itensimbui/orc_tooth.gif",
-        intricate_qty: "25", intricate_item: "Battle Stone", intricate_img: "images/itensimbui/battle_stone.gif",
-        powerful_qty: "20", powerful_item: "Moohtant Horn", powerful_img: "images/itensimbui/moohtant_horn.gif",
-        categoria: "Aumento de Skill"
-    },
-    // ... (adicionar todos os outros imbuements do seu código)
-];
+// Sistema de Carregamento de Abas
+class TabManager {
+    constructor() {
+        this.currentTab = 'imbuements';
+        this.loadedTabs = new Set();
+        this.init();
+    }
 
-// Função para criar widget de tier
-function createTierWidget(qty, itemName, imgPath) {
-    return `
-        <div class="tier-widget">
-            <div class="tier-qty">${qty}</div>
-            <img src="${imgPath}" alt="${itemName}" class="tier-img" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-            <div class="tier-name" style="display: none;">${itemName}</div>
-            <div class="tier-name">${itemName}</div>
-        </div>
-    `;
-}
+    init() {
+        this.setupEventListeners();
+        this.loadTab('imbuements');
+    }
 
-// Função para criar header do imbuement
-function createImbuementHeader(imb) {
-    return `
-        <div class="imbuement-header">
-            <img src="${imb.imbuement_img}" alt="${imb.imbuement}" class="imbuement-icon"
-                 onerror="this.style.display='none'">
-            <div class="imbuement-name">${imb.imbuement}</div>
-        </div>
-    `;
-}
+    setupEventListeners() {
+        // Eventos dos botões de aba
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabName = e.target.getAttribute('data-tab');
+                this.switchTab(tabName);
+            });
+        });
 
-// Função para popular a tabela
-function populateImbuementsTable(data) {
-    const tbody = document.getElementById('imbuements-table-body');
-    tbody.innerHTML = '';
+        // Outros eventos (modal, etc)
+        document.getElementById('about-btn').addEventListener('click', () => {
+            this.showAboutModal();
+        });
 
-    data.forEach(imb => {
-        const row = document.createElement('tr');
-        
-        row.innerHTML = `
-            <td>${createImbuementHeader(imb)}</td>
-            <td><strong>${imb.categoria}</strong></td>
-            <td>${createTierWidget(imb.basic_qty, imb.basic_item, imb.basic_img)}</td>
-            <td>${createTierWidget(imb.intricate_qty, imb.intricate_item, imb.intricate_img)}</td>
-            <td>${createTierWidget(imb.powerful_qty, imb.powerful_item, imb.powerful_img)}</td>
+        document.getElementById('quit-btn').addEventListener('click', () => {
+            this.quitApplication();
+        });
+    }
+
+    async loadTab(tabName) {
+        try {
+            // Carrega o HTML da aba
+            const response = await fetch(`components/${tabName}.html`);
+            const html = await response.text();
+            
+            // Insere no conteúdo da aba
+            document.getElementById('tab-content').innerHTML = html;
+            
+            // Atualiza botões ativos
+            this.updateActiveTab(tabName);
+            
+            // Carrega o JavaScript específico da aba (se existir)
+            if (!this.loadedTabs.has(tabName)) {
+                await this.loadTabScript(tabName);
+                this.loadedTabs.add(tabName);
+            }
+            
+            // Atualiza status
+            this.updateStatus(`✅ ${this.getTabDisplayName(tabName)} - Carregado`);
+            
+        } catch (error) {
+            console.error(`Erro ao carregar aba ${tabName}:`, error);
+            this.showErrorTab(tabName, error);
+        }
+    }
+
+    async loadTabScript(tabName) {
+        try {
+            const script = document.createElement('script');
+            script.src = `components/${tabName}.js`;
+            document.body.appendChild(script);
+        } catch (error) {
+            console.warn(`Script da aba ${tabName} não encontrado`);
+        }
+    }
+
+    switchTab(tabName) {
+        this.currentTab = tabName;
+        this.loadTab(tabName);
+    }
+
+    updateActiveTab(tabName) {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    }
+
+    getTabDisplayName(tabName) {
+        const names = {
+            'imbuements': 'Imbuements',
+            'services': 'Services',
+            'farm': 'Farm',
+            'loot': 'Divisão de Loot',
+            'drops': 'Divisão de Drops',
+            'timers': 'Timers',
+            'passwords': 'Senhas'
+        };
+        return names[tabName] || tabName;
+    }
+
+    updateStatus(message) {
+        document.getElementById('status-text').textContent = message;
+    }
+
+    showErrorTab(tabName, error) {
+        document.getElementById('tab-content').innerHTML = `
+            <div class="error-tab">
+                <h2>❌ Erro ao carregar ${this.getTabDisplayName(tabName)}</h2>
+                <p>${error.message}</p>
+                <button onclick="tabManager.loadTab('${tabName}')" class="btn-retry">
+                    🔄 Tentar Novamente
+                </button>
+            </div>
         `;
-        
-        tbody.appendChild(row);
-    });
+    }
+
+    showAboutModal() {
+        // código do modal
+    }
+
+    quitApplication() {
+        // código de saída
+    }
 }
 
-// Função de busca
-function filterImbuements() {
-    const searchText = document.getElementById('imbuement-search').value.toLowerCase();
-    
-    if (!searchText) {
-        populateImbuementsTable(imbuementsData);
-        return;
-    }
-    
-    const filteredData = imbuementsData.filter(imb => 
-        imb.imbuement.toLowerCase().includes(searchText) ||
-        imb.categoria.toLowerCase().includes(searchText) ||
-        imb.basic_item.toLowerCase().includes(searchText) ||
-        imb.intricate_item.toLowerCase().includes(searchText) ||
-        imb.powerful_item.toLowerCase().includes(searchText)
-    );
-    
-    populateImbuementsTable(filteredData);
-}
-
-// Inicializar quando a aba for carregada
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('imbuement-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', filterImbuements);
-        populateImbuementsTable(imbuementsData);
-    }
+// Inicializar quando a página carregar
+let tabManager;
+document.addEventListener('DOMContentLoaded', () => {
+    tabManager = new TabManager();
 });
