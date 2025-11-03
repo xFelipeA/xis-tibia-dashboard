@@ -107,12 +107,6 @@
             left: 100%;
         }
 
-        .btn-tray {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            color: white;
-            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
-        }
-
         .btn-about {
             background: linear-gradient(45deg, #2a9fd6, #17a2b8);
             color: white;
@@ -382,7 +376,6 @@
                 <div class="logo-text">Xis Tibia Dashboard</div>
             </div>
             <div class="header-buttons">
-                <button class="btn btn-tray" id="tray-btn">📌 Bandeja</button>
                 <button class="btn btn-about" id="about-btn">ℹ️ Sobre</button>
                 <button class="btn btn-quit" id="quit-btn">❌ Sair</button>
             </div>
@@ -390,10 +383,8 @@
 
         <div class="tabs-container">
             <div class="tabs-header">
-                <button class="tab-btn active" data-tab="tibia">🏠 Tibia.com</button>
-                <button class="tab-btn" data-tab="wiki">📚 Tibiawiki.com</button>
-                <button class="tab-btn" data-tab="guildstats">🏆 GuildStats.eu</button>
-                <button class="tab-btn" data-tab="imbuements">✨ Imbuements</button>
+                <!-- ABAS QUE VAMOS USAR -->
+                <button class="tab-btn active" data-tab="imbuements">✨ Imbuements</button>
                 <button class="tab-btn" data-tab="services">🔧 Services</button>
                 <button class="tab-btn" data-tab="farm">🤑 Farm</button>
                 <button class="tab-btn" data-tab="loot">💰 Divisão de Loot</button>
@@ -402,83 +393,8 @@
                 <button class="tab-btn" data-tab="passwords">🔑 Senhas</button>
             </div>
             <div class="tab-content">
-                <!-- Tibia.com Tab -->
-                <div class="tab-pane active" id="tibia-tab">
-                    <div class="tab-placeholder">
-                        <h2>🏠 Tibia.com</h2>
-                        <p>Acesso ao site oficial do Tibia com informações atualizadas sobre o jogo, notícias e eventos.</p>
-                        <div class="feature-grid">
-                            <div class="feature-card">
-                                <div class="feature-icon">📰</div>
-                                <div class="feature-title">Notícias</div>
-                                <div class="feature-desc">Acompanhe as últimas atualizações e eventos do Tibia</div>
-                            </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">👤</div>
-                                <div class="feature-title">Perfil</div>
-                                <div class="feature-desc">Consulte informações de personagens e guilds</div>
-                            </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">🏆</div>
-                                <div class="feature-title">Rankings</div>
-                                <div class="feature-desc">Acompanhe os rankings de experiência e achievements</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Wiki Tab -->
-                <div class="tab-pane" id="wiki-tab">
-                    <div class="tab-placeholder">
-                        <h2>📚 Tibiawiki.com</h2>
-                        <p>Consulta à wiki do Tibia com informações detalhadas sobre itens, criaturas, quests e muito mais.</p>
-                        <div class="feature-grid">
-                            <div class="feature-card">
-                                <div class="feature-icon">📖</div>
-                                <div class="feature-title">Wiki Completa</div>
-                                <div class="feature-desc">Acesso a toda base de conhecimento da comunidade</div>
-                            </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">🔍</div>
-                                <div class="feature-title">Busca Avançada</div>
-                                <div class="feature-desc">Encontre rapidamente informações específicas</div>
-                            </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">📊</div>
-                                <div class="feature-title">Estatísticas</div>
-                                <div class="feature-desc">Dados detalhados sobre itens e criaturas</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- GuildStats Tab -->
-                <div class="tab-pane" id="guildstats-tab">
-                    <div class="tab-placeholder">
-                        <h2>🏆 GuildStats.eu</h2>
-                        <p>Estatísticas detalhadas de guilds, membros e atividades no Tibia.</p>
-                        <div class="feature-grid">
-                            <div class="feature-card">
-                                <div class="feature-icon">📈</div>
-                                <div class="feature-title">Estatísticas</div>
-                                <div class="feature-desc">Análise detalhada do desempenho da guild</div>
-                            </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">👥</div>
-                                <div class="feature-title">Membros</div>
-                                <div class="feature-desc">Informações sobre os membros da guild</div>
-                            </div>
-                            <div class="feature-card">
-                                <div class="feature-icon">⚔️</div>
-                                <div class="feature-title">Atividades</div>
-                                <div class="feature-desc">Acompanhe as atividades recentes da guild</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Imbuements Tab -->
-                <div class="tab-pane" id="imbuements-tab">
+                <div class="tab-pane active" id="imbuements-tab">
                     <div class="tab-placeholder">
                         <h2>✨ Imbuements</h2>
                         <p>Calculadora de imbuements para otimizar seus equipamentos no Tibia.</p>
@@ -659,7 +575,7 @@
                 <div class="status-dot"></div>
                 <span id="status-text">✅ Sistema inicializado e pronto</span>
             </div>
-            <div id="tab-count">10 abas carregadas</div>
+            <div id="tab-count">7 abas carregadas</div>
         </div>
     </div>
 
@@ -684,9 +600,6 @@
                 </ul>
                 <p><b>Funcionalidades:</b></p>
                 <ul>
-                    <li>🏠 Tibia.com - Acesso ao site oficial</li>
-                    <li>📚 TibiaWiki.com - Consulta à wiki</li>
-                    <li>🏆 GuildStats.eu - Estatísticas de guilds</li>
                     <li>✨ Imbuements - Calculadora de imbuements</li>
                     <li>🔧 Services - Gerenciador de services</li>
                     <li>🤑 Farm - Controle de farm e lucro</li>
@@ -745,13 +658,6 @@
                 if (e.target === aboutModal) {
                     aboutModal.classList.remove('active');
                 }
-            });
-            
-            // Tray button functionality
-            document.getElementById('tray-btn').addEventListener('click', () => {
-                document.getElementById('status-text').textContent = '📌 Minimizado - Clique para restaurar';
-                // In a real PWA, this would minimize to system tray
-                alert('Em uma aplicação PWA, isso minimizaria para a bandeja do sistema');
             });
             
             // Quit button functionality
