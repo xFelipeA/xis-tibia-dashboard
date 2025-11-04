@@ -191,4 +191,132 @@ const imbuementsModule = (function() {
             imbuement_img: "images/iconsimbui/danofire.gif",
             basic_qty: "25", basic_item: "Fiery Heart", basic_img: "images/itensimbui/fiery_heart.gif",
             intricate_qty: "5", intricate_item: "Green Dragon Scale", intricate_img: "images/itensimbui/green_dragon_scale.gif",
-            powerful_qty: "
+            powerful_qty: "5", powerful_item: "Demon Horn", powerful_img: "images/itensimbui/demon_horn.gif",
+            categoria: "Dano Elemental"
+        }
+    ];
+
+    // Função para criar widget de tier
+    function createTierWidget(qty, itemName, imgPath) {
+        return `
+            <div class="tier-widget">
+                <div class="tier-qty">${qty}</div>
+                <img src="${imgPath}" alt="${itemName}" class="tier-img" 
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjMWExYTRlIi8+CjxwYXRoIGQ9Ik0xNiAxNk0zMiAzMk0zMiAxNk0xNiAzMiIgc3Ryb2tlPSIjMDBmZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+'; this.alt='Imagem não encontrada'">
+                <div class="tier-name">${itemName}</div>
+            </div>
+        `;
+    }
+
+    // Função para criar header do imbuement
+    function createImbuementHeader(imb) {
+        return `
+            <div class="imbuement-header">
+                <img src="${imb.imbuement_img}" alt="${imb.imbuement}" class="imbuement-icon"
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMWExYTRlIi8+CjxwYXRoIGQ9Ik0xMiAxMk0yOCAyOE0yOCAxMk0xMiAyOCIgc3Ryb2tlPSIjMDBmZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+'; this.alt='Ícone não encontrado'">
+                <div class="imbuement-name">${imb.imbuement}</div>
+            </div>
+        `;
+    }
+
+    // Função para popular a tabela
+    function populateImbuementsTable(data) {
+        const tbody = document.getElementById('imbuements-table-body');
+        
+        if (!tbody) {
+            console.error('Elemento tbody não encontrado!');
+            return;
+        }
+        
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="no-results">
+                        🔍 Nenhum imbuement encontrado com os critérios de busca.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        data.forEach(imb => {
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td>${createImbuementHeader(imb)}</td>
+                <td style="text-align: center; font-weight: bold; color: var(--accent);">${imb.categoria}</td>
+                <td style="text-align: center;">${createTierWidget(imb.basic_qty, imb.basic_item, imb.basic_img)}</td>
+                <td style="text-align: center;">${createTierWidget(imb.intricate_qty, imb.intricate_item, imb.intricate_img)}</td>
+                <td style="text-align: center;">${createTierWidget(imb.powerful_qty, imb.powerful_item, imb.powerful_img)}</td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+
+        // Atualiza o status
+        updateStatus(`✅ ${data.length} imbuements carregados`);
+    }
+
+    // Função de busca
+    function filterImbuements() {
+        const searchText = document.getElementById('imbuement-search').value.toLowerCase();
+        
+        if (!searchText) {
+            populateImbuementsTable(imbuementsData);
+            return;
+        }
+        
+        const filteredData = imbuementsData.filter(imb => 
+            imb.imbuement.toLowerCase().includes(searchText) ||
+            imb.categoria.toLowerCase().includes(searchText) ||
+            imb.basic_item.toLowerCase().includes(searchText) ||
+            imb.intricate_item.toLowerCase().includes(searchText) ||
+            imb.powerful_item.toLowerCase().includes(searchText)
+        );
+        
+        populateImbuementsTable(filteredData);
+    }
+
+    // Função de inicialização
+    function initializeImbuements() {
+        const searchInput = document.getElementById('imbuement-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterImbuements);
+            populateImbuementsTable(imbuementsData);
+            console.log('✅ Imbuements carregado com sucesso!');
+            console.log(`📊 Total de ${imbuementsData.length} imbuements carregados`);
+        } else {
+            console.error('Campo de busca não encontrado!');
+        }
+    }
+
+    // Função para atualizar o status
+    function updateStatus(message) {
+        const statusText = document.getElementById('status-text');
+        if (statusText) {
+            statusText.textContent = message;
+        }
+        
+        // Também atualiza no tab manager se disponível
+        if (window.tabManager) {
+            window.tabManager.updateStatus(message);
+        }
+    }
+
+    // Retorna as funções públicas
+    return {
+        initializeImbuements,
+        filterImbuements,
+        populateImbuementsTable
+    };
+})();
+
+// Torna o módulo global
+window.imbuementsModule = imbuementsModule;
+
+// Inicialização automática quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Módulo de Imbuements carregado!');
+});
