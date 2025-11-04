@@ -1,19 +1,18 @@
-// Sistema de Carregamento de Abas
+// Tab Manager
 class TabManager {
     constructor() {
         this.currentTab = 'imbuements';
-        this.loadedTabs = new Set();
         this.init();
     }
 
     init() {
-        this.setupEventListeners();
-        this.loadTab('imbuements');
-        this.startHealthCheck();
+        this.bindEvents();
+        this.loadTabContent('imbuements');
+        this.updateStatus('✅ Sistema inicializado e pronto');
     }
 
-    setupEventListeners() {
-        // Eventos dos botões de aba
+    bindEvents() {
+        // Tab buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const tabName = e.target.getAttribute('data-tab');
@@ -21,93 +20,268 @@ class TabManager {
             });
         });
 
-        // Modal About
-        document.getElementById('about-btn').addEventListener('click', () => {
-            this.showAboutModal();
+        // About modal
+        const aboutBtn = document.getElementById('about-btn');
+        const aboutModal = document.getElementById('about-modal');
+        const closeModal = document.querySelector('.close-modal');
+
+        aboutBtn.addEventListener('click', () => {
+            aboutModal.classList.add('active');
         });
 
-        document.querySelector('.close-modal').addEventListener('click', () => {
-            this.hideAboutModal();
+        closeModal.addEventListener('click', () => {
+            aboutModal.classList.remove('active');
         });
 
-        document.getElementById('about-modal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('about-modal')) {
-                this.hideAboutModal();
+        aboutModal.addEventListener('click', (e) => {
+            if (e.target === aboutModal) {
+                aboutModal.classList.remove('active');
             }
         });
 
-        // Botão Sair
+        // Quit button
         document.getElementById('quit-btn').addEventListener('click', () => {
-            this.quitApplication();
+            if (confirm('Deseja realmente sair?')) {
+                this.updateStatus('🔴 Sistema finalizado');
+                setTimeout(() => {
+                    document.body.innerHTML = `
+                        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--primary); color: var(--accent); font-size: 24px;">
+                            ✅ Xis Tibia Dashboard - Sistema Finalizado
+                        </div>
+                    `;
+                }, 1000);
+            }
         });
-    }
 
-    async loadTab(tabName) {
-        try {
-            this.showLoading();
-            
-            // Carrega o HTML da aba
-            const response = await fetch(`components/${tabName}.html`);
-            if (!response.ok) throw new Error(`Erro ${response.status}`);
-            
-            const html = await response.text();
-            
-            // Insere no conteúdo da aba
-            document.getElementById('tab-content').innerHTML = html;
-            
-            // Atualiza botões ativos
-            this.updateActiveTab(tabName);
-            
-            // Carrega o JavaScript específico da aba (se existir)
-            if (!this.loadedTabs.has(tabName)) {
-                await this.loadTabScript(tabName);
-                this.loadedTabs.add(tabName);
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        this.switchTab('imbuements');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        this.switchTab('services');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        this.switchTab('farm');
+                        break;
+                }
             }
             
-            // Inicializa a aba específica
-            this.initializeTab(tabName);
-            
-            // Atualiza status
-            this.updateStatus(`✅ ${this.getTabDisplayName(tabName)} - Carregado`);
-            
-        } catch (error) {
-            console.error(`Erro ao carregar aba ${tabName}:`, error);
-            this.showErrorTab(tabName, error);
-        }
-    }
-
-    async loadTabScript(tabName) {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = `components/${tabName}.js`;
-            script.onload = resolve;
-            script.onerror = () => reject(new Error(`Script ${tabName}.js não encontrado`));
-            document.body.appendChild(script);
+            if (e.key === 'Escape') {
+                aboutModal.classList.remove('active');
+            }
         });
-    }
-
-    initializeTab(tabName) {
-        // Chama função de inicialização específica de cada aba
-        const initFunction = window[`initialize${this.capitalizeFirst(tabName)}`];
-        if (typeof initFunction === 'function') {
-            initFunction();
-        }
-    }
-
-    capitalizeFirst(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     switchTab(tabName) {
-        this.currentTab = tabName;
-        this.loadTab(tabName);
-    }
-
-    updateActiveTab(tabName) {
+        // Update tab buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active');
         });
+        
         document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+        // Update current tab
+        this.currentTab = tabName;
+        
+        // Load tab content
+        this.loadTabContent(tabName);
+        
+        // Update status
+        this.updateStatus(`✅ Aba ${this.getTabDisplayName(tabName)} carregada`);
+    }
+
+    loadTabContent(tabName) {
+        const tabContent = document.getElementById('tab-content');
+        
+        // Show loading
+        tabContent.innerHTML = `
+            <div class="tab-loading">
+                <div class="loading-spinner"></div>
+                <p>Carregando ${this.getTabDisplayName(tabName)}...</p>
+            </div>
+        `;
+
+        // Load content based on tab
+        setTimeout(() => {
+            switch(tabName) {
+                case 'imbuements':
+                    this.loadImbuementsTab();
+                    break;
+                case 'services':
+                    this.loadServicesTab();
+                    break;
+                case 'farm':
+                    this.loadFarmTab();
+                    break;
+                case 'loot':
+                    this.loadLootTab();
+                    break;
+                case 'drops':
+                    this.loadDropsTab();
+                    break;
+                case 'timers':
+                    this.loadTimersTab();
+                    break;
+                case 'passwords':
+                    this.loadPasswordsTab();
+                    break;
+                default:
+                    this.loadDefaultTab();
+            }
+        }, 300);
+    }
+
+    loadImbuementsTab() {
+        const tabContent = document.getElementById('tab-content');
+        
+        tabContent.innerHTML = `
+            <div class="tab-content-inner">
+                <!-- Barra de Busca -->
+                <div class="search-section">
+                    <div class="search-group">
+                        <label>🔍 Buscar Imbuement:</label>
+                        <input type="text" id="imbuement-search" 
+                               placeholder="Digite o nome do imbuement, item ou categoria...">
+                    </div>
+                </div>
+
+                <!-- Tabela de Imbuements -->
+                <div class="table-container">
+                    <table class="imbuements-table">
+                        <thead>
+                            <tr>
+                                <th>Imbuement</th>
+                                <th>Categoria</th>
+                                <th>Basic</th>
+                                <th>Intricate</th>
+                                <th>Powerful</th>
+                            </tr>
+                        </thead>
+                        <tbody id="imbuements-table-body">
+                            <!-- Dados carregados via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        // Initialize imbuements
+        if (window.imbuementsModule) {
+            window.imbuementsModule.initializeImbuements();
+        } else {
+            console.error('Módulo de imbuements não carregado!');
+            this.updateStatus('❌ Erro ao carregar imbuements');
+        }
+    }
+
+    loadServicesTab() {
+        const tabContent = document.getElementById('tab-content');
+        tabContent.innerHTML = `
+            <div class="tab-placeholder">
+                <h2>🔧 Services</h2>
+                <p>Gerenciador de services - Em desenvolvimento</p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚔️</div>
+                        <div class="feature-title">Services de Boss</div>
+                        <div class="feature-desc">Agendamento e controle de services de bosses</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <div class="feature-title">Services de Quest</div>
+                        <div class="feature-desc">Organização de services de quests</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <div class="feature-title">Services de Farm</div>
+                        <div class="feature-desc">Controle de services de farm</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    loadFarmTab() {
+        const tabContent = document.getElementById('tab-content');
+        tabContent.innerHTML = `
+            <div class="tab-placeholder">
+                <h2>🤑 Farm</h2>
+                <p>Controle de farm e lucro - Em desenvolvimento</p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-title">Estatísticas</div>
+                        <div class="feature-desc">Acompanhamento detalhado de farm</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💸</div>
+                        <div class="feature-title">Lucro</div>
+                        <div class="feature-desc">Cálculo automático de lucro</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⏱️</div>
+                        <div class="feature-title">Tempo</div>
+                        <div class="feature-desc">Controle de tempo de farm</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    loadLootTab() {
+        const tabContent = document.getElementById('tab-content');
+        tabContent.innerHTML = `
+            <div class="tab-placeholder">
+                <h2>💰 Divisão de Loot</h2>
+                <p>Calculadora de divisão de loot - Em desenvolvimento</p>
+            </div>
+        `;
+    }
+
+    loadDropsTab() {
+        const tabContent = document.getElementById('tab-content');
+        tabContent.innerHTML = `
+            <div class="tab-placeholder">
+                <h2>⚖️ Divisão de Drops</h2>
+                <p>Controle de divisão de drops raros - Em desenvolvimento</p>
+            </div>
+        `;
+    }
+
+    loadTimersTab() {
+        const tabContent = document.getElementById('tab-content');
+        tabContent.innerHTML = `
+            <div class="tab-placeholder">
+                <h2>⏰ Timers</h2>
+                <p>Timers úteis para Tibia - Em desenvolvimento</p>
+            </div>
+        `;
+    }
+
+    loadPasswordsTab() {
+        const tabContent = document.getElementById('tab-content');
+        tabContent.innerHTML = `
+            <div class="tab-placeholder">
+                <h2>🔑 Senhas</h2>
+                <p>Gerenciador seguro de senhas - Em desenvolvimento</p>
+            </div>
+        `;
+    }
+
+    loadDefaultTab() {
+        const tabContent = document.getElementById('tab-content');
+        tabContent.innerHTML = `
+            <div class="tab-placeholder">
+                <h2>🚀 Xis Tibia Dashboard</h2>
+                <p>Selecione uma aba para começar a usar as ferramentas</p>
+            </div>
+        `;
     }
 
     getTabDisplayName(tabName) {
@@ -123,64 +297,24 @@ class TabManager {
         return names[tabName] || tabName;
     }
 
-    showLoading() {
-        document.getElementById('tab-content').innerHTML = `
-            <div class="tab-loading">
-                <div class="loading-spinner"></div>
-                <p>Carregando...</p>
-            </div>
-        `;
-    }
-
     updateStatus(message) {
-        document.getElementById('status-text').textContent = message;
-    }
-
-    showErrorTab(tabName, error) {
-        document.getElementById('tab-content').innerHTML = `
-            <div class="error-tab">
-                <h2>❌ Erro ao carregar ${this.getTabDisplayName(tabName)}</h2>
-                <p>${error.message}</p>
-                <button onclick="tabManager.loadTab('${tabName}')" class="btn-retry">
-                    🔄 Tentar Novamente
-                </button>
-            </div>
-        `;
-        this.updateStatus(`❌ Erro na aba ${this.getTabDisplayName(tabName)}`);
-    }
-
-    showAboutModal() {
-        document.getElementById('about-modal').classList.add('active');
-    }
-
-    hideAboutModal() {
-        document.getElementById('about-modal').classList.remove('active');
-    }
-
-    quitApplication() {
-        if (confirm('Deseja realmente sair do Xis Tibia Dashboard?')) {
-            this.updateStatus('👋 Encerrando aplicação...');
-            // Em uma PWA real, isso fecharia o app
-            setTimeout(() => {
-                alert('Aplicação encerrada. Em uma PWA real, o app seria fechado.');
-            }, 1000);
+        const statusText = document.getElementById('status-text');
+        if (statusText) {
+            statusText.textContent = message;
         }
-    }
-
-    startHealthCheck() {
-        // Simula verificação de saúde da aplicação
-        setInterval(() => {
-            const statusDot = document.querySelector('.status-dot');
-            if (statusDot) {
-                statusDot.style.backgroundColor = 'var(--success)';
-                statusDot.style.boxShadow = '0 0 10px var(--success)';
-            }
-        }, 5000);
     }
 }
 
-// Inicializar quando a página carregar
-let tabManager;
-document.addEventListener('DOMContentLoaded', () => {
-    tabManager = new TabManager();
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    window.tabManager = new TabManager();
+    
+    // Update tab count
+    const tabCount = document.getElementById('tab-count');
+    if (tabCount) {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabCount.textContent = `${tabButtons.length} abas disponíveis`;
+    }
+    
+    console.log('🚀 Xis Tibia Dashboard inicializado com sucesso!');
 });
