@@ -4,95 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xis Tibia Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        /* Fallback caso o CSS não carregue */
-        body {
-            background: #0f0f23;
-            color: white;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dark-theme.css">
+    <link rel="stylesheet" href="styles/neon-effects.css">
+    <link rel="icon" href="images/xislogo.png">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <img src="images/xislogo.png" alt="Xis Tibia Dashboard" class="logo-img" onerror="this.style.display='none'">
-                <div class="logo-text">Xis Tibia Dashboard</div>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <img src="images/xislogo.png" alt="Xis Tibia Dashboard" class="logo">
+                <h1 class="logo-text">Xis Tibia Dashboard</h1>
             </div>
             <div class="header-buttons">
-                <button class="btn btn-about" id="about-btn">ℹ️ Sobre</button>
-                <button class="btn btn-quit" id="quit-btn">❌ Sair</button>
+                <button class="btn btn-info" id="about-btn">ℹ️ Sobre</button>
+                <button class="btn btn-danger" id="quit-btn">❌ Sair</button>
             </div>
         </header>
 
-        <div class="tabs-container">
-            <div class="tabs-header">
-                <button class="tab-btn active" data-tab="imbuements">✨ Imbuements</button>
+        <!-- Tabs Navigation -->
+        <nav class="tabs-nav">
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="inicio">🏠 Início</button>
+                <button class="tab-btn" data-tab="imbuements">✨ Imbuements</button>
                 <button class="tab-btn" data-tab="services">🔧 Services</button>
                 <button class="tab-btn" data-tab="farm">🤑 Farm</button>
-                <button class="tab-btn" data-tab="loot">💰 Divisão de Loot</button>
-                <button class="tab-btn" data-tab="drops">⚖️ Divisão de Drops</button>
+                <button class="tab-btn" data-tab="divisao-loot">💰 Divisão de Loot</button>
+                <button class="tab-btn" data-tab="divisao-drops">⚖️ Divisão de Drops</button>
                 <button class="tab-btn" data-tab="timers">⏰ Timers</button>
-                <button class="tab-btn" data-tab="passwords">🔑 Senhas</button>
+                <button class="tab-btn" data-tab="senhas">🔑 Senhas</button>
             </div>
-            
-            <div class="tab-content" id="tab-content">
-                <!-- Loading inicial -->
-                <div class="tab-loading">
-                    <div class="loading-spinner"></div>
-                    <p>Carregando Imbuements...</p>
+        </nav>
+
+        <!-- Tab Content -->
+        <main class="tab-content">
+            <!-- Início Tab -->
+            <div id="inicio-tab" class="tab-pane active">
+                <div class="welcome-container">
+                    <h2 class="neon-text">Bem-vindo ao Xis Tibia Dashboard</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>✨ Funcionalidades</h3>
+                            <ul>
+                                <li>Calculadora de Imbuements</li>
+                                <li>Gerenciador de Services</li>
+                                <li>Controle de Farm e Lucro</li>
+                                <li>Divisão de Loot e Drops</li>
+                                <li>Timers para Gameplay</li>
+                                <li>Gerenciador de Senhas</li>
+                            </ul>
+                        </div>
+                        <div class="stat-card">
+                            <h3>🎯 Status do Sistema</h3>
+                            <p id="system-status">✅ Sistema estável e pronto</p>
+                            <p id="loaded-tabs">0 abas carregadas</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="status-bar">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span id="status-text">✅ Sistema inicializado e pronto</span>
+            <!-- Imbuements Tab -->
+            <div id="imbuements-tab" class="tab-pane">
+                <!-- Content loaded dynamically -->
             </div>
-            <div id="tab-count">7 abas carregadas</div>
-        </div>
+
+            <!-- Services Tab -->
+            <div id="services-tab" class="tab-pane">
+                <!-- Content loaded dynamically -->
+            </div>
+
+            <!-- Farm Tab -->
+            <div id="farm-tab" class="tab-pane">
+                <!-- Content loaded dynamically -->
+            </div>
+
+            <!-- Divisão de Loot Tab -->
+            <div id="divisao-loot-tab" class="tab-pane">
+                <!-- Content loaded dynamically -->
+            </div>
+
+            <!-- Divisão de Drops Tab -->
+            <div id="divisao-drops-tab" class="tab-pane">
+                <!-- Content loaded dynamically -->
+            </div>
+
+            <!-- Timers Tab -->
+            <div id="timers-tab" class="tab-pane">
+                <!-- Content loaded dynamically -->
+            </div>
+
+            <!-- Senhas Tab -->
+            <div id="senhas-tab" class="tab-pane">
+                <!-- Content loaded dynamically -->
+            </div>
+        </main>
+
+        <!-- Status Bar -->
+        <footer class="status-bar">
+            <span id="status-label">✅ Sistema inicializado e pronto</span>
+        </footer>
     </div>
 
     <!-- About Modal -->
-    <div class="modal" id="about-modal">
+    <div id="about-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Sobre o Xis Tibia Dashboard</h2>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <h3>Xis Tibia Dashboard</h3>
-                <p>Versão Web - Moderna e Futurista</p>
-                <p>Uma ferramenta completa para jogadores de Tibia</p>
-                <p>Desenvolvido para a comunidade</p>
-                <hr>
-                <p><b>Como usar:</b></p>
-                <ul>
-                    <li><b>Navegação por abas</b>: Clique nas abas para acessar diferentes funcionalidades</li>
-                    <li><b>Design responsivo</b>: Funciona em desktop e dispositivos móveis</li>
-                    <li><b>Interface moderna</b>: Design futurista com efeitos neon</li>
-                </ul>
-                <p><b>Funcionalidades:</b></p>
-                <ul>
-                    <li>✨ Imbuements - Calculadora de imbuements</li>
-                    <li>🔧 Services - Gerenciador de services</li>
-                    <li>🤑 Farm - Controle de farm e lucro</li>
-                    <li>💰 Divisão de Loot - Calculadora de loot</li>
-                    <li>⚖️ Divisão de Drops - Controle de drops</li>
-                    <li>⏰ Timers - Timers úteis</li>
-                    <li>🔑 Senhas - Gerenciador de senhas</li>
-                </ul>
-                <p><b>Status:</b> ✅ Sistema estável e modernizado</p>
+            <span class="close">&times;</span>
+            <h2>Sobre o Xis Tibia Dashboard</h2>
+            <div class="about-content">
+                <!-- About content will be populated by JavaScript -->
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
-    <script src="imbuements.js"></script>
+    <!-- Scripts -->
+    <script src="scripts/utils/data-manager.js"></script>
+    <script src="scripts/utils/sound-manager.js"></script>
+    <script src="scripts/tabs/inicio.js"></script>
+    <script src="scripts/tabs/imbuements.js"></script>
+    <script src="scripts/tabs/services.js"></script>
+    <script src="scripts/tabs/farm.js"></script>
+    <script src="scripts/tabs/divisao-loot.js"></script>
+    <script src="scripts/tabs/divisao-drops.js"></script>
+    <script src="scripts/tabs/timers.js"></script>
+    <script src="scripts/tabs/senhas.js"></script>
+    <script src="scripts/main.js"></script>
 </body>
 </html>
